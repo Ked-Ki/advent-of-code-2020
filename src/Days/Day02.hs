@@ -53,21 +53,16 @@ type OutputB = Int
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = foldr ((+) . boolToInt . isValidA) 0
+partA = length . filter isValidA
 
 isValidA :: Password -> Bool
 isValidA (Password {letter, min, max, password}) = min <= numMatches && numMatches <= max
   where
-    numMatches = T.foldr ((+) . boolToInt . (letter ==)) 0 password
-
-boolToInt :: Bool -> Int
-boolToInt b
-  | b = 1
-  | otherwise = 0
+    numMatches = T.length $ T.filter (letter ==) password
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = foldr ((+) . boolToInt . isValidB) 0
+partB = length . filter isValidB
 
 isValidB :: Password -> Bool
 isValidB (Password {letter, min, max, password}) = minMatch /= maxMatch
