@@ -4,13 +4,13 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cdc214fe98961fb163de36934ba8a50bbd7962cb22c16b3da1e5261ee7cfd180
+-- hash: 9aa2a6688386f15d3e841597ecca75b0a42638a84a88366723db2d670f225ff5
 
 name:           ked-ki-aoc
 version:        0.1.0.0
 description:    Advent of Code solutions in Haskell
-homepage:       https://github.com/samcoy3/advent-of-code-template#readme
-bug-reports:    https://github.com/samcoy3/advent-of-code-template/issues
+homepage:       https://github.com/Ked-Ki/advent-of-code-2020#readme
+bug-reports:    https://github.com/Ked-Ki/advent-of-code-2020/issues
 author:         Kelsey Freese
 maintainer:     kmfreese@protonmail.com
 copyright:      2020 Kelsey Freese
@@ -22,7 +22,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/samcoy3/advent-of-code-template
+  location: https://github.com/Ked-Ki/advent-of-code-2020
 
 library
   exposed-modules:
