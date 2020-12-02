@@ -4,16 +4,16 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c048de24b751a122b2e914acaa90bbd5e796a925ef6214118e4891baf487f88f
+-- hash: cdc214fe98961fb163de36934ba8a50bbd7962cb22c16b3da1e5261ee7cfd180
 
-name:           aoc-template
+name:           ked-ki-aoc
 version:        0.1.0.0
-description:    A template for Advent of Code projects in Haskell
+description:    Advent of Code solutions in Haskell
 homepage:       https://github.com/samcoy3/advent-of-code-template#readme
 bug-reports:    https://github.com/samcoy3/advent-of-code-template/issues
-author:         Sam Coy
-maintainer:     samcoy3@gmail.com
-copyright:      2020 Sam Coy
+author:         Kelsey Freese
+maintainer:     kmfreese@protonmail.com
+copyright:      2020 Kelsey Freese
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -55,7 +55,7 @@ library
       Util.Parsers
       Util.Util
   other-modules:
-      Paths_aoc_template
+      Paths_ked_ki_aoc
   hs-source-dirs:
       src
   default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
@@ -72,20 +72,20 @@ library
     , vector
   default-language: Haskell2010
 
-executable aoc-template-exe
+executable aoc-exe
   main-is: Main.hs
   other-modules:
-      Paths_aoc_template
+      Paths_ked_ki_aoc
   hs-source-dirs:
       app
   default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aoc-template
-    , attoparsec
+      attoparsec
     , base >=4.7 && <5
     , containers
     , directory
+    , ked-ki-aoc
     , mtl
     , optparse-applicative
     , parser-combinators

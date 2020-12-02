@@ -21,19 +21,38 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = many' $ do
+  n <- decimal
+  skipSpace
+  return n
 
 ------------ TYPES ------------
-type Input = Void
+type Input = [Int]
 
-type OutputA = Void
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA ipt = fromJust $ findMatch (makeMap 2020 ipt) ipt
+
+findMatch :: Map Int Int -> [Int] -> Maybe Int
+findMatch m (x:xs) = maybe (findMatch m xs) (\x' -> Just (x*x')) (Map.lookup x m)
+findMatch _ [] = Nothing
+
+makeMap :: Int -> [Int] -> Map Int Int
+makeMap target = Map.fromList . map mkPair 
+  where
+    mkPair x = (target-x, x)
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = fromJust . findTriple
+
+findTriple :: [Int] -> Maybe Int
+findTriple (x:xs) = maybe (findTriple xs) (\x' -> Just (x*x')) $ findTwoMatches (2020-x) xs
+findTriple [] = Nothing
+
+findTwoMatches :: Int -> [Int] -> Maybe Int
+findTwoMatches target xs = findMatch (makeMap target xs) xs

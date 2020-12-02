@@ -1,10 +1,10 @@
-name:                aoc-template
+name:                ked-ki-aoc
 version:             0.1.0.0
-github:              "samcoy3/advent-of-code-template"
+github:              "Ked-Ki/advent-of-code-2020"
 license:             BSD3
-author:              "Sam Coy"
-maintainer:          "samcoy3@gmail.com"
-copyright:           "2020 Sam Coy"
+author:              "Kelsey Freese"
+maintainer:          "kmfreese@protonmail.com"
+copyright:           "2020 Kelsey Freese"
 
 extra-source-files:
 - README.md
@@ -16,7 +16,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         A template for Advent of Code projects in Haskell
+description:         Advent of Code solutions in Haskell
 
 dependencies:
 - base >= 4.7 && < 5
@@ -50,7 +50,7 @@ library:
     - DeriveFoldable
 
 executables:
-  aoc-template-exe:
+  aoc-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -74,4 +74,4 @@ executables:
     - DeriveFunctor
     - DeriveFoldable
     dependencies:
-    - aoc-template
+    - ked-ki-aoc
