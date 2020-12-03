@@ -10,6 +10,7 @@ import qualified Data.Set as Set
 import Data.Vector (Vector)
 import qualified Data.Vector as Vec
 import qualified Util.Util as U
+import Util.Parsers (coordinateParser, Coordinates(..))
 
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
@@ -21,19 +22,30 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = coordinateParser toSquare 0
+  where
+    toSquare '#' = Just ()
+    toSquare _ = Nothing
 
 ------------ TYPES ------------
-type Input = Void
+type Input = Coordinates () -- map will contain (x,y) iff (x,y) is a tree
 
-type OutputA = Void
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA = countTrees 3 1
+
+countTrees :: Int -> Int -> Input -> Int
+countTrees delta_x delta_y Coordinates{..} = 
+  length $ filter (isJust . flip Map.lookup coord_map) traversed
+  where
+    traversed = zip (map (`mod` (x_bound+1)) [0,delta_x..]) [0,delta_y..y_bound]
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB c = product $ map (\(x,y) -> countTrees x y c) slopes
+  where
+    slopes = [(1,1), (3,1), (5,1), (7,1), (1,2)]
