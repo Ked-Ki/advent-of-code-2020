@@ -47,8 +47,8 @@ keys = [ FieldDef "byr" True  (yearValid 1920 2002)
     yearValid l h = validateParser (decimal :: Parser Int) (inBounds l h)
 
     heightParser :: Parser Height
-    heightParser = choice [ (decimal :: Parser Int) >>= \x -> string "cm" >> return (Centimeter x)
-                          , (decimal :: Parser Int) >>= \x -> string "in" >> return (Inch x)
+    heightParser = choice [ Centimeter <$> (decimal :: Parser Int) <* string "cm"
+                          , Inch <$> (decimal :: Parser Int) <* string "in"
                           ]
 
     heightValid :: Height -> Bool
