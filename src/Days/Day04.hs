@@ -1,19 +1,11 @@
 module Days.Day04 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Maybe
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.Vector (Vector)
-import qualified Data.Vector as Vec
-import qualified Util.Util as U
-
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
+import qualified Data.Text as T
+import Data.Char (isSpace)
+import Data.Maybe (isJust)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -21,19 +13,92 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = sepBy passportParser (char '\n')
+  where
+    passportParser :: Parser [(T.Text,T.Text)]
+    passportParser = sepBy (choice (keyValParser . key <$> keys)) space
+      -- consume the trailing newline, otherwise we get empty passports b/w lines
+      >>= \p -> space >> return p
+
+    keyValParser :: T.Text -> Parser (T.Text,T.Text)
+    keyValParser k = do
+      key <- string k
+      char ':'
+      val <- takeTill isSpace
+      return (key,val)
+
 
 ------------ TYPES ------------
-type Input = Void
+type Input = [[(T.Text, T.Text)]]
 
-type OutputA = Void
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
+
+-- list of all passport fields
+keys :: [FieldDef]
+keys = [ FieldDef "byr" True  (yearValid 1920 2002)
+       , FieldDef "iyr" True  (yearValid 2010 2020)
+       , FieldDef "eyr" True  (yearValid 2020 2030)
+       , FieldDef "hgt" True  (validateParser heightParser heightValid)
+       , FieldDef "hcl" True  (checkParse hairColorParser)
+       , FieldDef "ecl" True  (checkParse eyeColorParser)
+       , FieldDef "pid" True  (checkParse passIdParser)
+       , FieldDef "cid" False (const True)
+       ]
+  where
+    yearValid :: Int -> Int -> T.Text -> Bool
+    yearValid l h = validateParser (decimal :: Parser Int) (inBounds l h)
+
+    heightParser :: Parser Height
+    heightParser = choice [ (decimal :: Parser Int) >>= \x -> string "cm" >> return (Centimeter x)
+                          , (decimal :: Parser Int) >>= \x -> string "in" >> return (Inch x)
+                          ]
+
+    heightValid :: Height -> Bool
+    heightValid (Centimeter x) = inBounds 150 193 x
+    heightValid (Inch x) = inBounds 59 76 x
+
+    -- we don't care what the value is for the remaining fields, so we return () and just check that
+    -- parseOnly returns a Right
+    hairColorParser :: Parser ()
+    hairColorParser = char '#' *> count 6 (satisfy (inClass "0-9a-f")) *> endOfInput
+
+    eyeColorParser :: Parser ()
+    eyeColorParser = choice (string <$> ["amb","blu","brn","gry","grn","hzl","oth"]) *> endOfInput
+
+    passIdParser :: Parser ()
+    passIdParser = count 9 digit *> endOfInput
+
+    validateParser :: Parser a -> (a -> Bool) -> T.Text -> Bool
+    validateParser parser pred t = either (const False) pred (parseOnly parser t)
+    -- NOTE: we have to use parseOnly here since we want to check exact lengths. with `parse`,
+    -- endOfInput won't parse
+
+    checkParse :: Parser () -> T.Text -> Bool
+    checkParse p = validateParser p (const True)
+
+    inBounds l h x = l <= x && x <= h
+
+-- field names & validation rules
+data FieldDef = FieldDef { key :: T.Text
+                         , required :: Bool
+                         , validateVal :: T.Text -> Bool
+                         }
+
+data Height = Centimeter Int | Inch Int
+
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA = length . filter isValid
+  where
+    isValid :: [(T.Text,T.Text)] -> Bool
+    isValid kvs = all (\FieldDef{..} -> not required || isJust (lookup key kvs)) keys
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB = length . filter isValid
+  where
+    isValid :: [(T.Text,T.Text)] -> Bool
+    isValid kvs = all (\FieldDef{..} -> not required || maybe False validateVal (lookup key kvs)) keys
