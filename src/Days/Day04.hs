@@ -16,16 +16,12 @@ inputParser :: Parser Input
 inputParser = sepBy passportParser (char '\n')
   where
     passportParser :: Parser [(T.Text,T.Text)]
-    passportParser = sepBy (choice (keyValParser . key <$> keys)) space
+    passportParser = sepBy (choice (keyValParser . key <$> keys)) space 
       -- consume the trailing newline, otherwise we get empty passports b/w lines
-      >>= \p -> space >> return p
+      <* space
 
     keyValParser :: T.Text -> Parser (T.Text,T.Text)
-    keyValParser k = do
-      key <- string k
-      char ':'
-      val <- takeTill isSpace
-      return (key,val)
+    keyValParser k = (,) <$> string k <* char ':' <*> takeTill isSpace
 
 
 ------------ TYPES ------------
