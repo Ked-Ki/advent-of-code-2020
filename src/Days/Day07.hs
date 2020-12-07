@@ -1,19 +1,24 @@
 module Days.Day07 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import Data.List
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Maybe
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Data.Vector (Vector)
-import qualified Data.Vector as Vec
-import qualified Util.Util as U
+
+import Control.Monad.State
+
+import Control.Applicative (liftA2, (<|>))
+import Data.Bifunctor (first, second)
+import Data.Functor (($>))
+
+import Data.Attoparsec.Text
+import Control.Applicative.Combinators (many)
+import qualified Data.Text as T
+import Data.Char (isPunctuation)
 
 import qualified Program.RunDay as R (runDay)
-import Data.Attoparsec.Text
-import Data.Void
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -21,19 +26,88 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = many $ do
+    outerBag <- bagTypeParser
+    "contain"
+    space
+    contents <- emptyBagParser <|> many (liftA2 (,) (decimal <* space) bagTypeParser)
+    endOfLine
+    return Rule { outer = outerBag
+                , contents = contents
+                }
+  where
+    bagTypeParser :: Parser BagType
+    bagTypeParser = T.unwords <$> count 2 anyWord
+                              <* ("bags" <|> "bag")
+                              <* skipWhile shouldSkip
+
+    emptyBagParser :: Parser [(Int, BagType)]
+    emptyBagParser = "no other bags." $> []
+
+    anyWord :: Parser T.Text
+    anyWord = takeTill shouldSkip <* skipWhile shouldSkip
+
+    shouldSkip = liftA2 (||) isHorizontalSpace isPunctuation
 
 ------------ TYPES ------------
-type Input = Void
+type Input = [Rule]
 
-type OutputA = Void
+type BagType = T.Text
 
-type OutputB = Void
+data Rule = Rule { outer :: BagType
+                 , contents :: [(Int, BagType)]
+                 }
+                 deriving Show
+
+type OutputA = Int
+
+type OutputB = Int
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA rules = length (bfsGraph (mkGraph rules) "shiny gold") - 1
+  where
+    -- make a graph from inner bag type to bag types that can hold it
+    mkGraph :: [Rule] -> Map BagType [BagType]
+    mkGraph (Rule{..}:rs) = foldr (Map.alter addType) (mkGraph rs) (snd <$> contents)
+      where
+        addType (Just ts) = Just (outer:ts)
+        addType Nothing = Just [outer]
+    mkGraph [] = Map.empty
+
+bfsGraph :: forall a. (Ord a) => Map a [a] -> a -> [a]
+bfsGraph m start = evalState go ([start], Set.empty)
+  where
+    go :: State ([a], Set a) [a]
+    go = gets fst >>= \case
+        (curNode:rest) -> do
+            visited <- gets snd
+            if Set.member curNode visited
+               then modify (first (const rest)) >> go
+               else (do
+                 let newVisited = Set.insert curNode visited
+                 let successors = getSuccessors m newVisited curNode
+                 modify $ first $ const (rest++successors)
+                 modify $ second $ const newVisited
+                 (curNode:) <$> go)
+        [] -> return []
+
+
+    getSuccessors :: Map a [a] -> Set a -> a -> [a]
+    getSuccessors graph visited key = filter notVisited $ fromMaybe [] $ Map.lookup key graph
+      where
+        notVisited = not . flip Set.member visited
+
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB rules = countBags (mkGraph rules) "shiny gold" - 1
+  where
+    mkGraph :: [Rule] -> Map BagType [(Int,BagType)]
+    mkGraph = Map.fromList . map ((,) <$> outer <*> contents)
+
+    countBags :: forall a. (Ord a) => Map a [(Int,a)] -> a -> Int
+    countBags m start = go start
+      where
+        go :: a -> Int
+        go curNode = foldr (\(c,node) acc -> acc + c * go node) 1 (fromJust $ Map.lookup curNode m)
