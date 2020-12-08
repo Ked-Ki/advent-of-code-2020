@@ -10,7 +10,7 @@ import qualified Data.Set as Set
 import Control.Monad.State
 
 import Control.Applicative (liftA2, (<|>))
-import Data.Bifunctor (first, second)
+import Data.Bifunctor (first)
 import Data.Functor (($>))
 
 import Data.Attoparsec.Text
@@ -79,18 +79,15 @@ bfsGraph :: forall a. (Ord a) => Map a [a] -> a -> [a]
 bfsGraph m start = evalState go ([start], Set.empty)
   where
     go :: State ([a], Set a) [a]
-    go = gets fst >>= \case
-        (curNode:rest) -> do
-            visited <- gets snd
-            if Set.member curNode visited
-               then modify (first (const rest)) >> go
-               else (do
-                 let newVisited = Set.insert curNode visited
-                 let successors = getSuccessors m newVisited curNode
-                 modify $ first $ const (rest++successors)
-                 modify $ second $ const newVisited
-                 (curNode:) <$> go)
-        [] -> return []
+    go = get >>= \case
+        (curNode:rest, visited) ->
+          if Set.member curNode visited
+          then modify (first (const rest)) >> go
+          else let newVisited = Set.insert curNode visited
+                   successors = getSuccessors m newVisited curNode
+               in  put (rest++successors, newVisited) >>
+                   (curNode:) <$> go
+        ([],_) -> return []
 
 
     getSuccessors :: Map a [a] -> Set a -> a -> [a]
@@ -110,4 +107,6 @@ partB rules = countBags (mkGraph rules) "shiny gold" - 1
     countBags m start = go start
       where
         go :: a -> Int
-        go curNode = foldr (\(c,node) acc -> acc + c * go node) 1 (fromJust $ Map.lookup curNode m)
+        go curNode = foldr (\(c,node) acc -> acc + c * go node)
+                           1
+                           (fromMaybe [] $ Map.lookup curNode m)
