@@ -29,6 +29,7 @@ dependencies:
 - mtl
 - vector
 - pointedlist
+- array
 
 library:
   source-dirs: src

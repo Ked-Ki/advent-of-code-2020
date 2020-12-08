@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9aa2a6688386f15d3e841597ecca75b0a42638a84a88366723db2d670f225ff5
+-- hash: e01be0cee5d6c71a492cd80cacdbd3e1a669941f57ab14e9732dd614bd377864
 
 name:           ked-ki-aoc
 version:        0.1.0.0
@@ -60,7 +60,8 @@ library
       src
   default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   build-depends:
-      attoparsec
+      array
+    , attoparsec
     , base >=4.7 && <5
     , containers
     , directory
@@ -81,7 +82,8 @@ executable aoc-exe
   default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      attoparsec
+      array
+    , attoparsec
     , base >=4.7 && <5
     , containers
     , directory
