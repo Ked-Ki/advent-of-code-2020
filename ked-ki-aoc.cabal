@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e01be0cee5d6c71a492cd80cacdbd3e1a669941f57ab14e9732dd614bd377864
+-- hash: dd8679ff1687e973f7d808d7c23a4a0b1b15ea8b81b35810d72d5f6ad692f3cc
 
 name:           ked-ki-aoc
 version:        0.1.0.0
@@ -65,6 +65,7 @@ library
     , base >=4.7 && <5
     , containers
     , directory
+    , lens
     , mtl
     , optparse-applicative
     , parser-combinators
@@ -88,6 +89,7 @@ executable aoc-exe
     , containers
     , directory
     , ked-ki-aoc
+    , lens
     , mtl
     , optparse-applicative
     , parser-combinators
