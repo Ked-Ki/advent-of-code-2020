@@ -1,19 +1,14 @@
 module Days.Day10 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Maybe
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.Vector (Vector)
-import qualified Data.Vector as Vec
-import qualified Util.Util as U
+import Data.IntMap (IntMap)
+import qualified Data.IntMap as IntMap
+import Data.IntSet (IntSet)
+import qualified Data.IntSet as IntSet
 
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
+import Control.Applicative.Combinators (many)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -21,19 +16,40 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = foldr IntSet.insert IntSet.empty <$> many (decimal <* endOfLine)
 
 ------------ TYPES ------------
-type Input = Void
+type Input = IntSet
 
-type OutputA = Void
+-- map of diff size to counts. puzzle asks for counts of 1 & 3 multiplied together
+type OutputA = IntMap Int
 
-type OutputB = Void
+type OutputB = Maybe Int
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
-
+partA adapterSet = snd $ IntSet.foldl update (0,initialMap) setWithPhone
+  where
+    update (prev,map) cur = (cur, IntMap.update (Just . (+1)) (cur-prev) map)
+    initialMap = IntMap.fromList [(1,0),(2,0),(3,0)]
+    setWithPhone = IntSet.insert (IntSet.findMax adapterSet + 3) adapterSet
+    
+    
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB adapterSet = IntMap.lookup 0 $ runDP (maxElem-1) dpMap
+  where
+   runDP :: Int -> IntMap Int -> IntMap Int
+   runDP cur m 
+     | cur >= 0 = runDP (cur-1) $ IntMap.alter update cur m
+     | otherwise = m
+        where
+          update = fmap $ const $ IntMap.findWithDefault 0 (cur+3) m +
+                                  IntMap.findWithDefault 0 (cur+2) m +
+                                  IntMap.findWithDefault 0 (cur+1) m 
+
+   dpMap :: IntMap Int
+   dpMap = IntMap.fromSet (const 1) withEnds
+
+   withEnds = IntSet.insert 0 $ IntSet.insert maxElem adapterSet
+   maxElem = IntSet.findMax adapterSet + 3
