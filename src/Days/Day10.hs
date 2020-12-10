@@ -37,19 +37,18 @@ partA adapterSet = snd $ IntSet.foldl update (0,initialMap) setWithPhone
     
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB adapterSet = IntMap.lookup 0 $ runDP (maxElem-1) dpMap
+partB adapterSet = IntMap.lookup 0 $ runDP (maxElem-1) (IntMap.singleton maxElem 1)
   where
    runDP :: Int -> IntMap Int -> IntMap Int
    runDP cur m 
-     | cur >= 0 = runDP (cur-1) $ IntMap.alter update cur m
+     | cur >= 0 = runDP (cur-1) $ if IntSet.member cur withEnds 
+                                     then IntMap.insert cur newVal m
+                                     else m
      | otherwise = m
         where
-          update = fmap $ const $ IntMap.findWithDefault 0 (cur+3) m +
-                                  IntMap.findWithDefault 0 (cur+2) m +
-                                  IntMap.findWithDefault 0 (cur+1) m 
-
-   dpMap :: IntMap Int
-   dpMap = IntMap.fromSet (const 1) withEnds
+          newVal = IntMap.findWithDefault 0 (cur+3) m +
+                   IntMap.findWithDefault 0 (cur+2) m +
+                   IntMap.findWithDefault 0 (cur+1) m 
 
    withEnds = IntSet.insert 0 $ IntSet.insert maxElem adapterSet
    maxElem = IntSet.findMax adapterSet + 3
