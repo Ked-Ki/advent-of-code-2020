@@ -9,6 +9,7 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Vector (Vector)
 import qualified Data.Vector as Vec
+import Debug.Trace (trace)
 {- ORMOLU_ENABLE -}
 
 {-
@@ -40,3 +41,11 @@ chunksOf n ls
   | n <= 0 = error "Cannot split into chunks of negative length."
   | length ls < n = [ls]
   | otherwise = (take n ls) : (chunksOf n (drop n ls))
+
+enumInBounds :: Int -> Int -> (Int,Int) -> [Int]
+enumInBounds x dx (lx,hx)
+      | dx < 0 && lx <= x = [x,x+dx..lx]
+      | dx > 0 && hx >= x = [x,x+dx..hx]
+      | dx == 0          = repeat x
+      | otherwise = []
+
