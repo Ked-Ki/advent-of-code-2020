@@ -3,21 +3,10 @@
 module Days.Day02 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Maybe
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.Vector (Vector)
-import qualified Data.Vector as Vec
-import qualified Util.Util as U
-
 import qualified Data.Text as T
 
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -33,7 +22,7 @@ inputParser = many' $ do
   letter <- anyChar
   char ':'
   skipSpace
-  password <- takeTill isEndOfLine 
+  password <- takeTill isEndOfLine
   endOfLine
   return $ Password letter min max password
 
@@ -56,7 +45,7 @@ partA :: Input -> OutputA
 partA = length . filter isValidA
 
 isValidA :: Password -> Bool
-isValidA (Password {letter, min, max, password}) = min <= numMatches && numMatches <= max
+isValidA Password{..} = min <= numMatches && numMatches <= max
   where
     numMatches = T.length $ T.filter (letter ==) password
 
@@ -65,7 +54,7 @@ partB :: Input -> OutputB
 partB = length . filter isValidB
 
 isValidB :: Password -> Bool
-isValidB (Password {letter, min, max, password}) = minMatch /= maxMatch
+isValidB Password{..} = minMatch /= maxMatch
   where
     checkIdx :: Int -> T.Text -> Bool
     checkIdx i t = letter == T.index t (i-1)

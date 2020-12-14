@@ -12,20 +12,20 @@ runDay inputParser partA partB verbose inputFile = do
     inputFileExists <- liftIO $ doesFileExist inputFile
     fileContents <-
       if inputFileExists
-        then (liftIO $ readFile inputFile)
+        then liftIO $ readFile inputFile
         else throwError $ "I couldn't read the input! I was expecting it to be at " ++ inputFile
-    case (parseOnly inputParser . pack $ fileContents) of
+    case parseOnly inputParser . pack $ fileContents of
       Left e -> throwError $ "Parser failed to read input. Error " ++ e
       Right i -> do
         when verbose $ do
           liftIO $ putStrLn "Parser output:"
-          liftIO . putStrLn . show $ i
+          liftIO . print $ i
         return i
   processInput input
   where
     processInput (Left x) = putStrLn x
     processInput (Right i) = do
       putStrLn "Part A:"
-      catch (print $ partA i) (\m -> return (m :: SomeException) >> putStrLn "Couldn't run Part A!" >> (when verbose $ print m))
+      catch (print $ partA i) (\m -> putStrLn "Couldn't run Part A!" >> when verbose (print (m :: SomeException)))
       putStrLn "Part B:"
-      catch (print $ partB i) (\m -> return (m :: SomeException) >> putStrLn "Couldn't run Part B!" >> (when verbose $ print m))
+      catch (print $ partB i) (\m -> putStrLn "Couldn't run Part B!" >> when verbose (print (m :: SomeException)))
