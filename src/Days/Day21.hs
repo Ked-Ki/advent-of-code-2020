@@ -11,7 +11,7 @@ import Data.Vector (Vector)
 import qualified Data.Vector as Vec
 import qualified Util.Util as U
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Data.Void
 {- ORMOLU_ENABLE -}
@@ -26,14 +26,18 @@ inputParser = error "Not implemented yet!"
 ------------ TYPES ------------
 type Input = Void
 
-type OutputA = Void
+type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
-type OutputB = Void
+type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+solveA :: Input -> OutputA
+solveA = error "Not implemented yet!"
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+solveB :: Input -> OutputB
+solveB = error "Not implemented yet!"

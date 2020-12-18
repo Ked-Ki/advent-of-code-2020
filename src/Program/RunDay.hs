@@ -1,4 +1,4 @@
-module Program.RunDay (runDay) where
+module Program.RunDay (runDay, Part(..), defaultPart) where
 
 import Control.Exception (SomeException, catch)
 import Control.Monad.Except
@@ -6,7 +6,19 @@ import Data.Attoparsec.Text
 import Data.Text (pack)
 import System.Directory (doesFileExist)
 
-runDay :: (Show a, Show b, Show i) => Parser i -> (i -> a) -> (i -> b) -> Bool -> String -> IO ()
+data Part i a = Part { name :: String
+                     , solve :: i -> a
+                     , showSol :: a -> String
+                     , toInt :: a -> Integer
+                     }
+
+defaultPart :: (Show a, Integral a) => String -> (i -> a) -> Part i a
+defaultPart name solve = Part{..}
+  where
+    showSol = show
+    toInt = toInteger
+
+runDay :: (Show i) => Parser i -> Part i a -> Part i b -> Bool -> String -> IO ()
 runDay inputParser partA partB verbose inputFile = do
   input <- runExceptT $ do
     inputFileExists <- liftIO $ doesFileExist inputFile
@@ -23,9 +35,15 @@ runDay inputParser partA partB verbose inputFile = do
         return i
   processInput input
   where
+    runPart :: i -> Part i a' -> IO ()
+    runPart i Part{..} = putStrLn (name ++ ":") >>
+      catch (let sol = solve i
+              in when verbose (putStrLn $ showSol sol) >> 
+                 print (toInt sol))
+            (\m -> putStrLn ("Couldn't run " ++ name) >>
+              when verbose (print (m :: SomeException))) 
+
     processInput (Left x) = putStrLn x
     processInput (Right i) = do
-      putStrLn "Part A:"
-      catch (print $ partA i) (\m -> putStrLn "Couldn't run Part A!" >> when verbose (print (m :: SomeException)))
-      putStrLn "Part B:"
-      catch (print $ partB i) (\m -> putStrLn "Couldn't run Part B!" >> when verbose (print (m :: SomeException)))
+      runPart i partA
+      runPart i partB

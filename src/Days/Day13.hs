@@ -4,7 +4,7 @@ module Days.Day13 (runDay) where
 import Data.List
 import Data.Maybe
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Control.Applicative.Combinators ((<|>))
 import Data.Ord (comparing)
@@ -26,20 +26,28 @@ inputParser = do
 type Input = (Integer, [Maybe Integer])
 
 type OutputA = (Integer, Integer)
+partA :: R.Part Input OutputA
+partA = R.Part { name = "Part A"
+               , solve = solveA
+               , showSol = show
+               , toInt = uncurry (*)
+               }
 
 type OutputB = Integer
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA (dTime, ids) = second negate busIdWaitTime
+solveA :: Input -> OutputA
+solveA (dTime, ids) = second negate busIdWaitTime
   where
     busIdWaitTime = maximumBy (comparing snd) idsAndWaitTimes
     idsAndWaitTimes = map ((,) <$> id <*> timeToNext) $ catMaybes ids
     timeToNext id = (dTime `mod` id) - id
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB (_,bs) = go 0 allMbs
+solveB :: Input -> OutputB
+solveB (_,bs) = go 0 allMbs
   where
     -- Let `b1,b2..bn` be the busses in the input, and let `m1,m2..mn` be the offset at which they
     -- appear in the list. 

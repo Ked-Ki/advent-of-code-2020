@@ -4,7 +4,7 @@ module Days.Day14 (runDay) where
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Data.Word (Word64)
 import Control.Applicative (Alternative((<|>)))
@@ -46,12 +46,16 @@ initMem :: Memory
 initMem = Map.empty
 
 type OutputA = Word64
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Word64
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA = sumMemory . go initMem initMaskA
+solveA :: Input -> OutputA
+solveA = sumMemory . go initMem initMaskA
   where
     go :: Memory -> MaskA -> [Inst] -> Memory
     go mem msk (Set{..}       :is') = let newMem = Map.insert addr (applyMaskA msk val) mem
@@ -84,8 +88,8 @@ applyMaskA MaskA{..} x = (x .|. oneMask) .&. zeroMask
 
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB = sumMemory . go initMem initMaskB
+solveB :: Input -> OutputB
+solveB = sumMemory . go initMem initMaskB
   where
     go :: Memory -> MaskB -> [Inst] -> Memory
     go mem msk (Set{..}       :is') = let newMem = foldr (`Map.insert` val) mem (applyMaskB msk addr)

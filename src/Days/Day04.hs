@@ -1,7 +1,7 @@
 module Days.Day04 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import qualified Data.Text as T
 import Data.Char (isSpace)
@@ -28,8 +28,12 @@ inputParser = sepBy passportParser (char '\n')
 type Input = [[(T.Text, T.Text)]]
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 -- list of all passport fields
 keys :: [FieldDef]
@@ -86,15 +90,15 @@ data Height = Centimeter Int | Inch Int
 
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA = length . filter isValid
+solveA :: Input -> OutputA
+solveA = length . filter isValid
   where
     isValid :: [(T.Text,T.Text)] -> Bool
     isValid kvs = all (\FieldDef{..} -> not required || isJust (lookup key kvs)) keys
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB = length . filter isValid
+solveB :: Input -> OutputB
+solveB = length . filter isValid
   where
     isValid :: [(T.Text,T.Text)] -> Bool
     isValid kvs = all (\FieldDef{..} -> not required || maybe False validateVal (lookup key kvs)) keys

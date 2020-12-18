@@ -5,7 +5,7 @@ module Days.Day02 (runDay) where
 {- ORMOLU_DISABLE -}
 import qualified Data.Text as T
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 {- ORMOLU_ENABLE -}
 
@@ -37,12 +37,16 @@ data Password = Password { letter :: Char
                 deriving Show
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA = length . filter isValidA
+solveA :: Input -> OutputA
+solveA = length . filter isValidA
 
 isValidA :: Password -> Bool
 isValidA Password{..} = min <= numMatches && numMatches <= max
@@ -50,8 +54,8 @@ isValidA Password{..} = min <= numMatches && numMatches <= max
     numMatches = T.length $ T.filter (letter ==) password
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB = length . filter isValidB
+solveB :: Input -> OutputB
+solveB = length . filter isValidB
 
 isValidB :: Password -> Bool
 isValidB Password{..} = minMatch /= maxMatch

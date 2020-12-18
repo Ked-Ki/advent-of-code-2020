@@ -4,7 +4,7 @@ module Days.Day06 (runDay) where
 import Data.Set (Set)
 import qualified Data.Set as Set
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Data.Foldable (Foldable(fold))
 import qualified Data.Text as T
@@ -25,15 +25,19 @@ inputParser = sepBy (many' personParser) endOfLine
 type Input = [[Set Char]]
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA = sum . map (Set.size . fold)
+solveA :: Input -> OutputA
+solveA = sum . map (Set.size . fold)
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB = sum . map (Set.size . foldr Set.intersection completeSet)
+solveB :: Input -> OutputB
+solveB = sum . map (Set.size . foldr Set.intersection completeSet)
   where
     completeSet = Set.fromList "abcdefghijklmnopqrstuvwxyz"

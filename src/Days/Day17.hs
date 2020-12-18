@@ -7,7 +7,7 @@ import qualified Data.Map.Strict as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Util.Parsers (prettyPrintCoords, Coordinates(..), coord_map, coordinateParser)
 {- ORMOLU_ENABLE -}
@@ -30,13 +30,21 @@ type Coord4 = (Int,Int,Int,Int)
 
 type Grid c = Map c () -- a value indicates active, absent indicates inactive
 
-type OutputA = Int
+type OutputA = Grid Coord3
+partA :: R.Part Input OutputA
+partA = R.Part { name = "Part A"
+               , solve = solveA
+               , showSol = ppGrid
+               , toInt = toInteger . Map.size
+               }
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA g = Map.size $ runSim getAdj3d threeDGrid !! 6
+solveA :: Input -> OutputA
+solveA g = runSim getAdj3d threeDGrid !! 6
   where
     threeDGrid = Map.mapKeys (\(x,y) -> (x,y,0)) g
 
@@ -104,8 +112,8 @@ ppGrid g = unlines $ map (`prettyPrintCoords` \case Just _ -> '#'; Nothing -> '.
 
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB g =Map.size $ runSim getAdj4d fourDGrid !! 6
+solveB :: Input -> OutputB
+solveB g = Map.size $ runSim getAdj4d fourDGrid !! 6
   where
     fourDGrid = Map.mapKeys (\(x,y) -> (x,y,0,0)) g
 

@@ -18,7 +18,7 @@ import Control.Applicative.Combinators (many)
 import qualified Data.Text as T
 import Data.Char (isPunctuation)
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -60,12 +60,16 @@ data Rule = Rule { outer :: BagType
                  deriving Show
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA rules = length (bfsGraph (mkGraph rules) "shiny gold") - 1
+solveA :: Input -> OutputA
+solveA rules = length (bfsGraph (mkGraph rules) "shiny gold") - 1
   where
     -- make a graph from inner bag type to bag types that can hold it
     mkGraph :: [Rule] -> Map BagType [BagType]
@@ -97,8 +101,8 @@ bfsGraph m start = evalState go ([start], Set.empty)
 
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB rules = countBags (mkGraph rules) "shiny gold" - 1
+solveB :: Input -> OutputB
+solveB rules = countBags (mkGraph rules) "shiny gold" - 1
   where
     mkGraph :: [Rule] -> Map BagType [(Int,BagType)]
     mkGraph = Map.fromList . map ((,) <$> outer <*> contents)

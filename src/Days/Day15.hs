@@ -4,7 +4,7 @@ module Days.Day15 (runDay) where
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 {- ORMOLU_ENABLE -}
 
@@ -19,12 +19,16 @@ inputParser = sepBy decimal ","
 type Input = [Int]
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA ipt = runGame ipt !! 2019
+solveA :: Input -> OutputA
+solveA ipt = runGame ipt !! 2019
 
 runGame :: Input -> [Int]
 runGame ipt = ipt ++ go (length ipt + 1) (last ipt) (Map.fromList $ zip (init ipt) [1..])
@@ -38,5 +42,5 @@ runGame ipt = ipt ++ go (length ipt + 1) (last ipt) (Map.fromList $ zip (init ip
         newMap = Map.insert last (turn - 1) m
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB ipt = runGame ipt !! 29999999
+solveB :: Input -> OutputB
+solveB ipt = runGame ipt !! 29999999

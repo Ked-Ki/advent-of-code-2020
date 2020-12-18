@@ -11,7 +11,7 @@ import Data.Bifunctor (Bifunctor(first))
 
 import qualified Data.Text as T
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Control.Applicative.Combinators (many)
 {- ORMOLU_ENABLE -}
@@ -64,12 +64,24 @@ type Range = (Int,Int)
 type Ticket = [Int]
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
-type OutputB = Int
+type OutputB = [(Rule, Int)]
+partB :: R.Part Input OutputB
+partB = R.Part { name = "Part B"
+               , solve = solveB
+               , showSol = unlines . map showField
+               , toInt = toInteger . product . map snd . getDepartureFields
+               }
+        where
+          getDepartureFields = filter (("departure" `T.isPrefixOf`) . name . fst)
+          showField (Rule{..},x) = T.unpack name ++ ": " ++ show x
+
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA Input{..} = sum $ concat $ lefts $ map (checkTicket rules) nearbyTickets
+solveA :: Input -> OutputA
+solveA Input{..} = sum $ concat $ lefts $ map (checkTicket rules) nearbyTickets
 
 checkTicket :: [Rule] -> Ticket -> Either [Int] Ticket
 checkTicket rs t = case invalidFields of
@@ -85,8 +97,8 @@ matchRule i Rule{ranges=(r1,r2)} = matchRange r1 || matchRange r2
     matchRange (l,h) = l <= i && i <= h
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB Input{..} = product $ map snd $ filter (("departure" `T.isPrefixOf`) . name . fst) labeledTicket
+solveB :: Input -> OutputB
+solveB Input{..} = labeledTicket
   where
     labeledTicket = zip solvedRules yourTicket
     solvedRules = solveRules $ map (findRules rules) (transpose validTickets)

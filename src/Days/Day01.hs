@@ -11,7 +11,7 @@ import Data.Vector (Vector)
 import qualified Data.Vector as Vec
 import qualified Util.Util as U
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Data.Void
 {- ORMOLU_ENABLE -}
@@ -30,12 +30,16 @@ inputParser = many' $ do
 type Input = [Int]
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA ipt = fromJust $ findMatch (makeMap 2020 ipt) ipt
+solveA :: Input -> OutputA
+solveA ipt = fromJust $ findMatch (makeMap 2020 ipt) ipt
 
 findMatch :: Map Int Int -> [Int] -> Maybe Int
 findMatch m (x:xs) = maybe (findMatch m xs) (\x' -> Just (x*x')) (Map.lookup x m)
@@ -47,8 +51,8 @@ makeMap target = Map.fromList . map mkPair
     mkPair x = (target-x, x)
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB = fromJust . findTriple
+solveB :: Input -> OutputB
+solveB = fromJust . findTriple
 
 findTriple :: [Int] -> Maybe Int
 findTriple (x:xs) = maybe (findTriple xs) (\x' -> Just (x*x')) $ findTwoMatches (2020-x) xs

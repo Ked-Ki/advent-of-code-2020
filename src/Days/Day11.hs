@@ -8,7 +8,7 @@ import Data.Maybe
 import qualified Util.Util as U
 import Util.Parsers (coordinateParser,Coordinates(..), overM)
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 {- ORMOLU_ENABLE -}
 
@@ -28,12 +28,16 @@ data Seat = Occupied | Vacant
 type SeatUpdater = Coordinates Seat -> (Int,Int) -> Seat -> Seat
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA = runSim updaterA
+solveA :: Input -> OutputA
+solveA = runSim updaterA
   where
     updaterA :: SeatUpdater
     updaterA m c Vacant   = if null (getAdjacents c m)
@@ -64,8 +68,8 @@ updateAllSeats f c = overM (Map.mapWithKey (f c)) c
 ------------ PART B ------------
 type Dir = (Int,Int)
 
-partB :: Input -> OutputB
-partB c = runSim updaterB c
+solveB :: Input -> OutputB
+solveB c = runSim updaterB c
   where
     updaterB :: SeatUpdater
     updaterB c seat Vacant   = if getAdjacentOccupiedCount c seat == 0

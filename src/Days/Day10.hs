@@ -6,9 +6,10 @@ import qualified Data.IntMap as IntMap
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R 
 import Data.Attoparsec.Text
 import Control.Applicative.Combinators (many)
+import Data.Maybe (fromJust)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -23,12 +24,24 @@ type Input = IntSet
 
 -- map of diff size to counts. puzzle asks for counts of 1 & 3 multiplied together
 type OutputA = IntMap Int
+partA :: R.Part Input OutputA
+partA = R.Part { name = "Part A"
+               , solve = solveA
+               , showSol = show
+               , toInt = \m -> toInteger . fromJust $ (*) <$> IntMap.lookup 1 m <*> IntMap.lookup 3 m
+               }
 
 type OutputB = Maybe Int
+partB :: R.Part Input OutputB
+partB = R.Part { name = "Part B"
+               , solve = solveB
+               , showSol = show
+               , toInt = toInteger . fromJust
+               }
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA adapterSet = snd $ IntSet.foldl update (0,initialMap) setWithPhone
+solveA :: Input -> OutputA
+solveA adapterSet = snd $ IntSet.foldl update (0,initialMap) setWithPhone
   where
     update (prev,map) cur = (cur, IntMap.update (Just . (+1)) (cur-prev) map)
     initialMap = IntMap.fromList [(1,0),(2,0),(3,0)]
@@ -36,8 +49,8 @@ partA adapterSet = snd $ IntSet.foldl update (0,initialMap) setWithPhone
     
     
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB adapterSet = IntMap.lookup 0 $ runDP (maxElem-1) (IntMap.singleton maxElem 1)
+solveB :: Input -> OutputB
+solveB adapterSet = IntMap.lookup 0 $ runDP (maxElem-1) (IntMap.singleton maxElem 1)
   where
    runDP :: Int -> IntMap Int -> IntMap Int
    runDP cur m 

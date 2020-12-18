@@ -6,7 +6,7 @@ import Data.Maybe
 
 import Control.Applicative (Alternative((<|>)))
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text as P
 {- ORMOLU_ENABLE -}
 
@@ -31,12 +31,16 @@ data SeatCode = SeatCode { rowStr :: String
                          deriving Show
 
 type OutputA = Int
+partA :: R.Part Input OutputA
+partA = R.defaultPart "Part A" solveA
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA codes = maximum $ map (rowColToSeatId . codeToRowCol) codes
+solveA :: Input -> OutputA
+solveA codes = maximum $ map (rowColToSeatId . codeToRowCol) codes
 
 -- seat id is just arbitrarily defined in the problem
 rowColToSeatId :: (Int, Int) -> Int
@@ -63,8 +67,8 @@ codeToRowCol SeatCode{..} = ( strToInt rowCharToBit rowStr
 
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB codes = fromJust $ findId sortedIds
+solveB :: Input -> OutputB
+solveB codes = fromJust $ findId sortedIds
   where
     -- look for two codes that are exactly 2 apart. result will be the number in between
     findId :: [Int] -> Maybe Int

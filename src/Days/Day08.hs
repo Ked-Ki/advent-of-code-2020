@@ -14,7 +14,7 @@ import Control.Lens
 
 import Data.Attoparsec.Text
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 {- ORMOLU_ENABLE -}
 
 ------------ PARSER ------------
@@ -63,8 +63,8 @@ type OutputA = SystemState
 type OutputB = SystemState
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA ipt = view sysState $ execState (runTillLoop ipt) initState
+solveA :: Input -> OutputA
+solveA ipt = view sysState $ execState (runTillLoop ipt) initState
   where
     initState = ExecutionState (SystemState 0 0) Set.empty
 
@@ -87,9 +87,16 @@ runTillLoop program = go
              Jmp i -> sysState.pc += i
 
 
+partA :: R.Part Input OutputA
+partA = R.Part { name = "Part A"
+               , solve = solveA
+               , showSol = show
+               , toInt = toInteger . view acc
+               }
+
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB ipt = view (exState.sysState) $ execState (backtrackOnLoop ipt) initState
+solveB :: Input -> OutputB
+solveB ipt = view (exState.sysState) $ execState (backtrackOnLoop ipt) initState
   where
     initState = BacktrackState (ExecutionState (SystemState 0 0) Set.empty) False
 
@@ -127,6 +134,13 @@ backtrackOnLoop program = go $> ()
            then return False
            -- otherwise, modify current instruction and continue running
            else modified .= True >> runModifiedInst >> go
+
+partB :: R.Part Input OutputB
+partB = R.Part { name = "Part B"
+               , solve = solveB
+               , showSol = show
+               , toInt = toInteger . view acc
+               }
 
 -- Run day (moved to bottom to accommodate TH)
 runDay :: Bool -> String -> IO ()

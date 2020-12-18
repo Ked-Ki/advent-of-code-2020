@@ -1,7 +1,7 @@
 module Days.Day12 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Control.Applicative.Combinators ((<|>), many)
 import Data.Functor (($>))
@@ -82,13 +82,28 @@ overBoat f w@Waypoint{..} = w { boat = f boat }
 initWaypoint :: Waypoint
 initWaypoint = Waypoint (10,1) (0,0)
 
+manhattanDist :: Pos -> Int
+manhattanDist (x,y) = abs x + abs y
+
 type OutputA = Pos
+partA :: R.Part Input OutputA
+partA = R.Part { name = "Part A"
+               , solve = solveA
+               , showSol = show
+               , toInt = toInteger . manhattanDist
+               }
 
 type OutputB = Pos
+partB :: R.Part Input OutputA
+partB = R.Part { name = "Part B"
+               , solve = solveB
+               , showSol = show
+               , toInt = toInteger . manhattanDist
+               }
 
 ------------ PART A ------------
-partA :: Input -> OutputA
-partA = pos . foldl runInstr initBoat
+solveA :: Input -> OutputA
+solveA = pos . foldl runInstr initBoat
   where
     runInstr :: Boat -> Instruction -> Boat
     runInstr b (Cardinal North y) = overPos (.+. (0,y)) b 
@@ -109,8 +124,8 @@ partA = pos . foldl runInstr initBoat
     runInstr b@Boat{..} (Forward x) = runInstr b (Cardinal facing x)
 
 ------------ PART B ------------
-partB :: Input -> OutputB
-partB = boat . foldl runInstr initWaypoint
+solveB :: Input -> OutputB
+solveB = boat . foldl runInstr initWaypoint
   where
     runInstr :: Waypoint -> Instruction -> Waypoint
     runInstr w              (Cardinal North y) = overWaypoint (.+. (0,y)) w

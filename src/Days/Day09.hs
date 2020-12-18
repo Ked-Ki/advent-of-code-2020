@@ -5,7 +5,7 @@ import Data.Maybe
 import Data.Set (Set)
 import qualified Data.Set as Set
 
-import qualified Program.RunDay as R (runDay)
+import qualified Program.RunDay as R
 import Data.Attoparsec.Text
 import Control.Applicative.Combinators (many)
 {- ORMOLU_ENABLE -}
@@ -60,15 +60,23 @@ fromList :: (Ord a) => [a] -> QueueSet a
 fromList xs = QueueSet{_head=xs, _tail=[], contents=Set.fromList xs}
 
 type OutputA = Maybe Int
+partA :: R.Part Input OutputA
+partA = R.Part { name = "Part A"
+             , solve = solveA
+             , showSol = show
+             , toInt = toInteger . fromJust
+             }
 
 type OutputB = Int
+partB :: R.Part Input OutputB
+partB = R.defaultPart "Part B" solveB
 
 ------------ PART A ------------
 
 -- find the first number in the input that is NOT the sum of two numbers in the preceding
 -- `contextLen` numbers
-partA :: Input -> OutputA
-partA ipt = go rest $ fromList preamble
+solveA :: Input -> OutputA
+solveA ipt = go rest $ fromList preamble
   where
     (preamble,rest) = splitAt contextLen ipt
     go :: [Int] -> QueueSet Int -> Maybe Int
@@ -80,10 +88,10 @@ partA ipt = go rest $ fromList preamble
 ------------ PART B ------------
 
 -- find a contiguous set of numbers in the input that sum to partA, return min + max of that set
-partB :: Input -> OutputB
-partB ipt = Set.findMin result + Set.findMax result
+solveB :: Input -> OutputB
+solveB ipt = Set.findMin result + Set.findMax result
   where
-    target = fromJust $ partA ipt
+    target = fromJust $ solveA ipt
     result = contents $ go ipt $ fromList []
     go :: [Int] -> QueueSet Int -> QueueSet Int
     go l@(x:xs) q = case compare (sum q) target of
